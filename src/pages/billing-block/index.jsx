@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import {
 	Row,
 	Col,
@@ -15,64 +15,17 @@ import {
 import moment from 'moment';
 import _ from 'lodash';
 
+import { Context } from '../../App';
+
 import './style.scss';
 
 const BillingBlock = () => {
 	const [ cart, setCart ] = useState([]);
-
-	const services = {
-		Facial: [
-			{
-				id: 1,
-				title: 'De-Tan Facial',
-				amount: 500
-			},
-			{
-				id: 2,
-				title: 'Diamond Facial',
-				amount: 1500
-			}
-		],
-		Wax: [
-			{
-				id: 3,
-				title: 'Brazilian liposoluble wax',
-				amount: 600
-			},
-			{
-				id: 4,
-				title: 'Rica liposoluble wax',
-				amount: 1000
-			}
-		],
-		SPA: [
-			{
-				id: 5,
-				title: 'Hair SPA - Loreal',
-				amount: 1500
-			},
-			{
-				id: 6,
-				title: 'Hair SPA - Matrix',
-				amount: 1000
-			}
-		],
-		Bleach: [
-			{
-				id: 7,
-				title: 'Oxy Crème Bleach',
-				amount: 500
-			},
-			{
-				id: 8,
-				title: 'Fruit Bleach',
-				amount: 500
-			}
-		]
-	};
+	const { data } = useContext(Context);
+	const services = data.service.response;
 
 	const addToCart = (data) => {
-		let alreadyInCartIndex = _.findIndex(cart, [ 'id', data.id ]);
+		let alreadyInCartIndex = _.findIndex(cart, [ '_id', data._id ]);
 		if (alreadyInCartIndex >= 0) {
 			let tempCart = cart;
 			tempCart[alreadyInCartIndex].quantity = tempCart[alreadyInCartIndex].quantity + 1;
@@ -84,7 +37,7 @@ const BillingBlock = () => {
 	};
 
 	const removeFromCart = (data) => {
-		let alreadyInCartIndex = _.findIndex(cart, [ 'id', data.id ]);
+		let alreadyInCartIndex = _.findIndex(cart, [ '_id', data._id ]);
 		if (alreadyInCartIndex >= 0) {
 			let tempCart = cart;
 			if (tempCart[alreadyInCartIndex].quantity > 1)
@@ -97,7 +50,7 @@ const BillingBlock = () => {
 	const renderList = (list) => {
 		return _.map(list, (data) => {
 			return (
-				<Row key={data.id}>
+				<Row key={data._id}>
 					<Col xs={8}>{data.title}</Col>
 					<Col xs={2}>
 						<Button onClick={() => addToCart(data)}>+</Button>
@@ -124,10 +77,10 @@ const BillingBlock = () => {
 		if (list.length > 0) {
 			return _.map(list, (data) => {
 				return (
-					<Row key={data.id} className="mb-1">
+					<Row key={data._id} className="mb-1">
 						<Col xs={8}>{data.title}</Col>
 						<Col xs={2}>
-							<ButtonGroup>
+							<ButtonGroup size="sm">
 								<Button onClick={() => removeFromCart(data)}>-</Button>
 								<Button>{data.quantity}</Button>
 								<Button onClick={() => addToCart(data)}>+</Button>
@@ -168,8 +121,9 @@ const BillingBlock = () => {
 						<Col xs={10}>
 							<Input
 								type="text"
-								placeholder="Type a customer name here"
+								placeholder="Today's date"
 								value={moment().format('DD/MM/YYYY')}
+								onChange={({ target: { value } }) => value}
 							/>
 						</Col>
 					</FormGroup>

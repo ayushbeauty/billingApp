@@ -1,49 +1,63 @@
 import React, { useReducer, useEffect } from 'react';
-import { Route, BrowserRouter, Redirect } from 'react-router-dom';
+import { Route, BrowserRouter, Redirect, Switch } from 'react-router-dom';
 
 import './App.scss';
 import Header from './components/header';
 import BillingBlock from './pages/billing-block';
 import Axios from 'axios';
+import Invoice from './pages/invoice';
 
 const types = {
 	REQ: 'Request_Service',
 	RES: 'Response_Service',
-	FAIL: 'Falied_Services'
+	FAIL: 'Falied_Service'
 };
 
-const initialState = {
+export const initialState = {
 	response: [],
 	requesting: false
 };
 
+const reducer = (state, { type, payload }) => {
+	switch (type) {
+		case types.REQ:
+			return {
+				...state,
+				requesting: true
+			};
+		case types.RES:
+			return { ...state, response: payload, requesting: false };
+		case types.FAIL:
+			return {
+				...state,
+				response: 'Error',
+				requesting: false
+			};
+		default:
+			return state;
+	}
+};
+
 export const Context = React.createContext();
 
+export const customAxios = Axios.create({
+	baseURL: 'http://localhost:8000/'
+});
+
+export const getServices = async (dispatch) => {
+	try {
+		const response = await customAxios.get('service');
+		return dispatch({ type: types.RES, payload: response.data });
+	} catch (err) {
+		return dispatch({ type: types.FAIL, payload: err });
+	}
+};
+
 const App = () => {
-	const [ state, dispatch ] = useReducer((state, { type, payload }) => {
-		switch (type) {
-			case types.REQ:
-				return {
-					...state,
-					requesting: true
-				};
-			case types.RES:
-				return { ...state, response: payload, requesting: false };
-			case types.FAIL:
-				return {
-					...state,
-					response: 'Error',
-					requesting: false
-				};
-			default:
-				return state;
-		}
-	}, initialState);
+	const [ state, dispatch ] = useReducer(reducer, initialState);
 
 	useEffect(() => {
-		Axios.get('http://localhost:8000/service')
-			.then((response) => dispatch({ type: types.RES, payload: response.data }))
-			.catch((err) => dispatch({ type: types.FAIL, payload: err }));
+		getServices(dispatch);
 	}, []);
 
 	return (
@@ -52,8 +66,11 @@ const App = () => {
 				<Header />
 				<section className="container">
 					<BrowserRouter>
-						<Route path="/" component={BillingBlock} />
-						<Redirect to="/" />
+						<Switch>
+							<Route path="/" exact component={BillingBlock} />
+							<Route path="/invoice/:id" component={Invoice} />
+							<Redirect to="/" />
+						</Switch>
 					</BrowserRouter>
 				</section>
 			</Context.Provider>

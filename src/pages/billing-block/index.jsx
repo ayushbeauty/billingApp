@@ -175,7 +175,7 @@ const BillingBlock = () => {
 					name: ''
 				}}
 			>
-				{({ setFieldValue }) => (
+				{({ setFieldValue, values }) => (
 					<Form>
 						<Row>
 							<Col xs={4}>
@@ -217,7 +217,17 @@ const BillingBlock = () => {
 									<Col xs={10}>
 										<Field name="name">
 											{({ field }) => (
-												<Input type="text" placeholder="Type a customer name here" {...field} />
+												<Input
+													type="text"
+													placeholder="Type a customer name here"
+													{...field}
+													onBlur={({ target: { value } }) => {
+														invoiceDispatch({
+															type: 'userData',
+															data: values
+														});
+													}}
+												/>
 											)}
 										</Field>
 									</Col>
@@ -470,7 +480,7 @@ const BillingBlock = () => {
 									data: invoice
 								}).then(({ data, status }) => {
 									if (status === 200) {
-										history.push(`/print/${data._id}`);
+										history.push(`/invoice/${data._id}`);
 									}
 								});
 							}}

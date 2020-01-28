@@ -473,6 +473,11 @@ const BillingBlock = () => {
 					<div className="text-right">
 						<Button
 							color="danger"
+							disabled={
+								!invoice.name ||
+								!invoice.mobileNumber ||
+								(invoice.services && invoice.services.length === 0)
+							}
 							onClick={() => {
 								customAxios({
 									method: 'POST',
@@ -494,9 +499,10 @@ const BillingBlock = () => {
 	);
 };
 
-const renderTotal = (cart) => {
+export const renderTotal = (cart) => {
 	let total = 0;
-	cart.map(({ amount, quantity }) => {
+	cart.map(({ amount, quantity, serviceId }) => {
+		amount = serviceId ? serviceId.amount : amount;
 		return (total = total + amount * quantity);
 	});
 	return total;

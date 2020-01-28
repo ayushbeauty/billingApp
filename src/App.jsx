@@ -6,6 +6,7 @@ import Header from './components/header';
 import BillingBlock from './pages/billing-block';
 import Axios from 'axios';
 import Invoice from './pages/invoice';
+import Dashboard from './pages/dashboard';
 
 const types = {
 	REQ: 'Request_Service',
@@ -63,16 +64,17 @@ const App = () => {
 	return (
 		<div>
 			<Context.Provider value={{ data: { service: state }, dispatches: { serviceDispatch: dispatch } }}>
-				<Header />
-				<section className="container">
-					<BrowserRouter>
+				<BrowserRouter>
+					<Header />
+					<section className="container">
 						<Switch>
-							<Route path="/" exact component={BillingBlock} />
-							<Route path="/invoice/:id" component={Invoice} />
+							<Route path="/" exact component={Dashboard} />
+							<Route path="/bill" component={BillingBlock} />
+							<Route path="/invoice/:id?" component={Invoice} />
 							<Redirect to="/" />
 						</Switch>
-					</BrowserRouter>
-				</section>
+					</section>
+				</BrowserRouter>
 			</Context.Provider>
 		</div>
 	);

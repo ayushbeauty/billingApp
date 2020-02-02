@@ -13,21 +13,21 @@ const Header = () => {
 			<h5 className="font-weight-light">Beauty Parlour</h5>
 			<p>No.73/2, Manjanakkara Street, Opp Lovely Cards, Madurai-625001</p>
 			<div className="container">
-				<Navbar color="light" expand="md">
-					<Nav card>
+				<Navbar color="pink" expand="md">
+					<Nav>
 						<NavItem>
-							<NavLink className="nav-link" to="/">
-								Dashboard
-							</NavLink>
-						</NavItem>
-						<NavItem>
-							<NavLink className="nav-link" to="/invoice">
-								Invoices
+							<NavLink className="nav-link" to="/dashboard">
+								Insights
 							</NavLink>
 						</NavItem>
 						<NavItem>
 							<NavLink className="nav-link" to="/bill">
 								Generate Bill
+							</NavLink>
+						</NavItem>
+						<NavItem>
+							<NavLink className="nav-link" to="/invoice">
+								Invoices
 							</NavLink>
 						</NavItem>
 					</Nav>

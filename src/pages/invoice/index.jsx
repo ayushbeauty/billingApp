@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { customAxios } from '../../App';
+import React, { useState, useContext } from 'react';
+import { customAxios, getInvoices } from '../../store';
 import { useParams, Link } from 'react-router-dom';
 import { Row, Col } from 'reactstrap';
 import _ from 'lodash';
@@ -7,31 +7,32 @@ import { useEffect } from 'react';
 import moment from 'moment';
 
 import { renderTotal } from './../billing-block';
+import { Context } from '../../store';
 
 const Invoice = () => {
 	const [ state, updateState ] = useState({});
+	const { data: { invoice }, dispatches: { invoiceDispatch } } = useContext(Context);
 	let { id } = useParams();
 	useEffect(
 		() => {
 			if (id) {
 				customAxios({ method: 'GET', url: `invoice/get/${id}` }).then(({ data, status }) => {
-					if (status === 200) updateState(data);
-				});
-			} else {
-				customAxios({ method: 'GET', url: 'invoice' }).then(({ data, status }) => {
 					if (status === 200) {
+						getInvoices(invoiceDispatch);
 						updateState(data);
 					}
 				});
+			} else {
+				updateState(invoice.response);
 			}
 		},
 		[ id ]
 	);
 
 	const renderServices = (services) => {
-		return _.map(services, ({ serviceId: { _id, title, amount }, quantity }) => (
+		return _.map(services, ({ serviceId: { _id, title, amount, category: { name } }, quantity }) => (
 			<Row key={_id}>
-				<Col xs={8}>{title}</Col>
+				<Col xs={8}>{`${title} - ${name}`}</Col>
 				<Col xs={2}>{quantity}</Col>
 				<Col xs={2}>{amount * quantity}</Col>
 			</Row>
@@ -44,12 +45,18 @@ const Invoice = () => {
 				<Link key={_id} to={`/invoice/${_id}`}>
 					<Row>
 						<Col xs={1}>{index + 1}</Col>
+						<Col xs={2}>{created_at ? moment(created_at).format('DD/MM/YYYY') : 'Date not specified'}</Col>
 						<Col>{name}</Col>
 						<Col>{renderTotal(services)}</Col>
-						<Col xs={2}>{moment(created_at).format('DD/MM/YYYY')}</Col>
 					</Row>
 				</Link>
 			));
+		} else {
+			return (
+				<Row>
+					<Col className="text-center text-muted">No invoice found</Col>
+				</Row>
+			);
 		}
 	};
 
@@ -88,12 +95,14 @@ const Invoice = () => {
 					</Col>
 				</Row>
 				<hr />
-				<Row className="font-italic mb-3">
-					<Col xs={1}>S.No</Col>
-					<Col>Customer Name</Col>
-					<Col>Total</Col>
-					<Col xs={2}>Date</Col>
-				</Row>
+				{state.length > 0 && (
+					<Row className="font-italic mb-3">
+						<Col xs={1}>S.No</Col>
+						<Col xs={2}>Date</Col>
+						<Col>Customer Name</Col>
+						<Col>Bill Amount</Col>
+					</Row>
+				)}
 				{renderInvoices(state)}
 			</div>
 		);

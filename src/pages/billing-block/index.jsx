@@ -18,7 +18,7 @@ import {
 import moment from 'moment';
 import _ from 'lodash';
 
-import { Context, initialState, customAxios, getServices } from '../../App';
+import { Context, initialState, customAxios, getServices } from '../../store';
 
 import './style.scss';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
@@ -114,7 +114,7 @@ const BillingBlock = () => {
 	const renderList = (list) => {
 		return _.map(list, (data) => {
 			return (
-				<Row key={data._id}>
+				<Row key={data._id} className="mb-1">
 					<Col xs={8}>{data.title}</Col>
 					<Col xs={4}>
 						<Button block={true} size="sm" outline={true} onClick={() => addToCart(data)}>
@@ -468,7 +468,7 @@ const BillingBlock = () => {
 				</Col>
 			</Row>
 			<br />
-			<Row>
+			<Row className="mb-3">
 				<Col>
 					<div className="text-right">
 						<Button

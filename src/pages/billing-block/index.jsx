@@ -174,8 +174,19 @@ const BillingBlock = () => {
 					mobileNumber: '',
 					name: ''
 				}}
+				validate={({ mobileNumber, name }) => {
+					let errors = {};
+					if (!mobileNumber) {
+						errors.mobileNumber = 'Number is required';
+					} else if (mobileNumber.length < 10 || mobileNumber.length > 10)
+						errors.mobileNumber = 'Enter a valid number';
+					if (!name) {
+						errors.name = 'Name is required';
+					}
+					return errors;
+				}}
 			>
-				{({ setFieldValue, values }) => (
+				{({ setFieldValue, values, setFieldTouched }) => (
 					<Form>
 						<Row>
 							<Col xs={4}>
@@ -183,7 +194,7 @@ const BillingBlock = () => {
 									<Label xs={2}>Mobile</Label>
 									<Col xs={10}>
 										<Field name="mobileNumber">
-											{({ field, field: { name } }) => {
+											{({ field, field: { name }, form }) => {
 												return (
 													<Input
 														type="number"
@@ -191,7 +202,8 @@ const BillingBlock = () => {
 														{...field}
 														onChange={({ target: { value } }) => setFieldValue(name, value)}
 														onBlur={({ target: { value } }) => {
-															if (value) {
+															if (value && _.isEmpty(form.errors.mobileNumber)) {
+																setFieldTouched(name, true);
 																customAxios({
 																	method: 'post',
 																	url: 'customer/getCustomerByMobileNumber',

@@ -1,32 +1,70 @@
 import React, { useState, useContext } from 'react';
 import { customAxios, getInvoices } from '../../store';
-import { useParams, Link } from 'react-router-dom';
-import { Row, Col } from 'reactstrap';
+import { useParams, useHistory } from 'react-router-dom';
+import { Row, Col, Button } from 'reactstrap';
 import _ from 'lodash';
 import { useEffect } from 'react';
 import moment from 'moment';
+import BootstrapTable from 'react-bootstrap-table-next';
 
 import { renderTotal } from './../billing-block';
 import { Context } from '../../store';
 
+const columns = [
+	{
+		dataField: '_id',
+		text: 'S.No',
+		formatter: (cell, row, rowIndex) => rowIndex + 1
+	},
+	{
+		dataField: 'created_at',
+		text: 'Date',
+		sort: true,
+		formatter: (cell, row, rowIndex) => (cell ? moment(cell).format('DD/MM/YYYY') : 'Date not specified')
+	},
+	{
+		dataField: 'customerId.name',
+		text: 'Name',
+		sort: true
+	},
+	{
+		dataField: 'services',
+		text: 'Particulars',
+		formatter: (cell, row) => {
+			return _.map(cell, ({ serviceId: { title, category: { name } } }, index) => {
+				return `${title} - ${name}${cell.length > 0
+					? index >= 0 && index < cell.length - 1 ? `, ` : ``
+					: ``}`;
+			});
+		}
+	},
+	{
+		dataField: 'updated_at',
+		text: 'Bill Amount',
+		formatter: (cell, { services }) => renderTotal(services)
+	}
+];
+
 const Invoice = () => {
-	const [ state, updateState ] = useState({});
+	const [ state, updateState ] = useState([]);
+	const [ invoiceData, updateInvoiceData ] = useState({});
 	const { data: { invoice }, dispatches: { invoiceDispatch } } = useContext(Context);
 	let { id } = useParams();
+	let history = useHistory();
 	useEffect(
 		() => {
 			if (id) {
 				customAxios({ method: 'GET', url: `invoice/get/${id}` }).then(({ data, status }) => {
 					if (status === 200) {
 						getInvoices(invoiceDispatch);
-						updateState(data);
+						updateInvoiceData(data);
 					}
 				});
-			} else {
+			} else if (invoice.response) {
 				updateState(invoice.response);
 			}
 		},
-		[ id ]
+		[ id, id || invoice ]
 	);
 
 	const renderServices = (services) => {
@@ -39,27 +77,6 @@ const Invoice = () => {
 		));
 	};
 
-	const renderInvoices = (invoices) => {
-		if (invoices.length > 0) {
-			return _.map(invoices, ({ _id, customerId: { name }, services, created_at }, index) => (
-				<Link key={_id} to={`/invoice/${_id}`}>
-					<Row>
-						<Col xs={1}>{index + 1}</Col>
-						<Col xs={2}>{created_at ? moment(created_at).format('DD/MM/YYYY') : 'Date not specified'}</Col>
-						<Col>{name}</Col>
-						<Col>{renderTotal(services)}</Col>
-					</Row>
-				</Link>
-			));
-		} else {
-			return (
-				<Row>
-					<Col className="text-center text-muted">No invoice found</Col>
-				</Row>
-			);
-		}
-	};
-
 	if (id) {
 		return (
 			<div>
@@ -68,11 +85,11 @@ const Invoice = () => {
 						<h2 className="text-center font-weight-light">Invoice</h2>
 					</Col>
 				</Row>
-				{state.customerId && (
+				{invoiceData.customerId && (
 					<Row>
 						<Col>
-							<h3 className="font-weight-light">{state.customerId.name}</h3>
-							<span className="text-muted">{state.customerId.mobileNumber}</span>
+							<h3 className="font-weight-light">{invoiceData.customerId.name}</h3>
+							<span className="text-muted">{invoiceData.customerId.mobileNumber}</span>
 						</Col>
 					</Row>
 				)}
@@ -83,7 +100,19 @@ const Invoice = () => {
 					<Col xs={2}>Quantity</Col>
 					<Col xs={2}>Amount</Col>
 				</Row>
-				{renderServices(state.services)}
+				{renderServices(invoiceData.services)}
+				<Row className="mt-4 no-print">
+					<Col className="text-right">
+						<Button
+							color="danger"
+							onClick={() => {
+								window.print();
+							}}
+						>
+							Print
+						</Button>
+					</Col>
+				</Row>
 			</div>
 		);
 	} else {
@@ -95,15 +124,19 @@ const Invoice = () => {
 					</Col>
 				</Row>
 				<hr />
-				{state.length > 0 && (
-					<Row className="font-italic mb-3">
-						<Col xs={1}>S.No</Col>
-						<Col xs={2}>Date</Col>
-						<Col>Customer Name</Col>
-						<Col>Bill Amount</Col>
-					</Row>
-				)}
-				{renderInvoices(state)}
+				<BootstrapTable
+					bootstrap4
+					keyField="_id"
+					columns={columns}
+					data={state}
+					hover
+					noDataIndication="No invoice found"
+					rowEvents={{
+						onClick: (e, { _id }) => {
+							history.push(`/invoice/${_id}`);
+						}
+					}}
+				/>
 			</div>
 		);
 	}

@@ -13,7 +13,7 @@ const Header = () => {
 			<h5 className="font-weight-light">Beauty Parlour</h5>
 			<p>No.73/2, Manjanakkara Street, Opp Lovely Cards, Madurai-625001</p>
 			<div className="container">
-				<Navbar color="pink" expand="md">
+				<Navbar color="pink" expand="md" className="no-print">
 					<Nav>
 						<NavItem>
 							<NavLink className="nav-link" to="/dashboard">

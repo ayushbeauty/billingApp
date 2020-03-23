@@ -63,7 +63,7 @@ const invoiceReducer = (state, { type, payload }) => {
 export const Context = React.createContext();
 
 export const customAxios = Axios.create({
-	baseURL: 'http://localhost:8000/'
+	baseURL: 'http://13.234.16.147:8000/'
 });
 
 export const getServices = async (dispatch) => {

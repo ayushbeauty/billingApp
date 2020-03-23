@@ -8,11 +8,11 @@ import { Navbar, Nav, NavItem } from 'reactstrap';
 const Header = () => {
 	return (
 		<header className="text-center">
-			{/* <img src={logo} width="100%" alt="Logo" className="header-logo" /> */}
-			<h1 className="font-weight-light pt-2">Ayush</h1>
-			<h5 className="font-weight-light">Beauty Parlour</h5>
-			<p>No.73/2, Manjanakkara Street, Opp Lovely Cards, Madurai-625001</p>
 			<div className="container">
+				{/* <img src={logo} width="100%" alt="Logo" className="header-logo" /> */}
+				<h1 className="font-weight-light pt-2">Ayush</h1>
+				<h5 className="font-weight-light">Beauty Parlour</h5>
+				<p>No.73/2, Manjanakkara Street, Opp Lovely Cards, Madurai-625001</p>
 				<Navbar color="pink" expand="md" className="no-print">
 					<Nav>
 						<NavItem>

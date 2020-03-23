@@ -19,7 +19,7 @@ const App = () => {
 							<Route path="/dashboard" exact component={Dashboard} />
 							<Route path="/bill" component={BillingBlock} />
 							<Route path="/invoice/:id?" component={Invoice} />
-							<Redirect to="/dashboard" />
+							<Redirect to="/bill" />
 						</Switch>
 					</section>
 				</BrowserRouter>

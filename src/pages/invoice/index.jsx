@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { customAxios, getInvoices } from '../../store';
+import { customAxios } from '../../store';
 import { useParams, useHistory } from 'react-router-dom';
 import { Row, Col, Button } from 'reactstrap';
 import _ from 'lodash';
@@ -9,6 +9,7 @@ import BootstrapTable from 'react-bootstrap-table-next';
 
 import { renderTotal } from './../billing-block';
 import { Context } from '../../store';
+import { useMemo } from 'react';
 
 const columns = [
 	{
@@ -48,15 +49,18 @@ const columns = [
 const Invoice = () => {
 	const [ state, updateState ] = useState([]);
 	const [ invoiceData, updateInvoiceData ] = useState({});
-	const { data: { invoice }, dispatches: { invoiceDispatch } } = useContext(Context);
+	const { data: { invoice } } = useContext(Context);
 	let { id } = useParams();
 	let history = useHistory();
+	// let total = 0;
+	const [ total, updateTotal ] = useState(0);
 	useEffect(
 		() => {
 			if (id) {
 				customAxios({ method: 'GET', url: `invoice/get/${id}` }).then(({ data, status }) => {
 					if (status === 200) {
-						getInvoices(invoiceDispatch);
+						// total = 0;
+						updateTotal(0);
 						updateInvoiceData(data);
 					}
 				});
@@ -64,25 +68,37 @@ const Invoice = () => {
 				updateState(invoice.response);
 			}
 		},
-		[ id, id || invoice ]
+		[ id, invoice ]
 	);
 
-	const renderServices = (services) => {
-		return _.map(services, ({ serviceId: { _id, title, amount, category: { name } }, quantity }) => (
-			<Row key={_id}>
-				<Col xs={8}>{`${title} - ${name}`}</Col>
-				<Col xs={2}>{quantity}</Col>
-				<Col xs={2}>{amount * quantity}</Col>
-			</Row>
-		));
-	};
+	const renderServices = useMemo(
+		() => {
+			let t = 0;
+			return _.map(
+				invoiceData.services,
+				({ serviceId: { _id, title, amount, category: { name } }, quantity }, index) => {
+					t = t + amount * quantity;
+					if (invoiceData.services.length === index + 1) updateTotal(t);
+					return (
+						<Row key={_id}>
+							<Col xs={8}>{`${title} - ${name}`}</Col>
+							<Col xs={2}>{quantity}</Col>
+							<Col xs={2}>{amount * quantity}</Col>
+						</Row>
+					);
+				}
+			);
+		},
+		[ invoiceData ]
+	);
 
 	if (id) {
 		return (
 			<div>
 				<Row>
-					<Col>
-						<h2 className="text-center font-weight-light">Invoice</h2>
+					<Col className="text-center">
+						<h2 className="font-weight-light">Invoice</h2>
+						{id}
 					</Col>
 				</Row>
 				{invoiceData.customerId && (
@@ -100,7 +116,11 @@ const Invoice = () => {
 					<Col xs={2}>Quantity</Col>
 					<Col xs={2}>Amount</Col>
 				</Row>
-				{renderServices(invoiceData.services)}
+				{renderServices}
+				<Row className="mt-3">
+					<Col xs={10}>Total</Col>
+					<Col xs={2}>{total}</Col>
+				</Row>
 				<Row className="mt-4 no-print">
 					<Col className="text-right">
 						<Button
@@ -120,7 +140,7 @@ const Invoice = () => {
 			<div>
 				<Row>
 					<Col>
-						<h2 className="text-center font-weight-light">Invoice</h2>
+						<h2 className="text-center font-weight-light">Invoices</h2>
 					</Col>
 				</Row>
 				<hr />

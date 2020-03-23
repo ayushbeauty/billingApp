@@ -18,7 +18,7 @@ import {
 import moment from 'moment';
 import _ from 'lodash';
 
-import { Context, initialState, customAxios, getServices } from '../../store';
+import { Context, initialState, customAxios, getServices, getInvoices } from '../../store';
 
 import './style.scss';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
@@ -68,8 +68,8 @@ const BillingBlock = () => {
 	const [ categoryData, updateCategoryData ] = useState(categoryInitData);
 	const [ addServiceModalInstance, updateaddServiceModalInstance ] = useState(false);
 	const [ addCategoryModalInstance, updateaddCategoryModalInstance ] = useState(false);
-	const { data: { service }, dispatches: { serviceDispatch } } = useContext(Context);
-	const [ invoice, invoiceDispatch ] = useReducer((state, { type, data }) => {
+	const { data: { service }, dispatches: { serviceDispatch, invoiceDispatch } } = useContext(Context);
+	const [ payload, payloadDispatch ] = useReducer((state, { type, data }) => {
 		switch (type) {
 			case 'userData':
 				let { mobileNumber, name } = data;
@@ -87,7 +87,7 @@ const BillingBlock = () => {
 
 	useEffect(
 		() => {
-			invoiceDispatch({ type: 'service', data: cart });
+			payloadDispatch({ type: 'service', data: cart });
 		},
 		[ cart ]
 	);
@@ -131,6 +131,7 @@ const BillingBlock = () => {
 						<span className="float-right">
 							<Button
 								size="sm"
+								outline={true}
 								onClick={() => {
 									getCategories();
 									updateServiceData({ ...data, category: data.category._id });
@@ -143,7 +144,7 @@ const BillingBlock = () => {
 						</span>
 					</Col>
 					<Col xs={4}>
-						<Button block={true} size="sm" outline={true} onClick={() => addToCart(data)}>
+						<Button block={true} size="sm" onClick={() => addToCart(data)}>
 							Add to Cart
 						</Button>
 					</Col>
@@ -161,6 +162,7 @@ const BillingBlock = () => {
 						<span className="float-right">
 							<Button
 								size="sm"
+								outline={true}
 								onClick={(e) => {
 									e.preventDefault();
 									updateCategoryData(value[0].category);
@@ -320,6 +322,8 @@ const BillingBlock = () => {
 				</ModalBody>
 			</Modal>
 			<Modal
+				fade={true}
+				centered={true}
 				isOpen={addCategoryModalInstance}
 				toggle={() => {
 					setUpdateFlag(!updateFlag);
@@ -431,7 +435,7 @@ const BillingBlock = () => {
 																}).then(({ data, status }) => {
 																	if (status === 200) {
 																		setFieldValue('name', data.name);
-																		invoiceDispatch({ type: 'userData', data });
+																		payloadDispatch({ type: 'userData', data });
 																	}
 																});
 															}
@@ -454,7 +458,7 @@ const BillingBlock = () => {
 													placeholder="Type a customer name here"
 													{...field}
 													onBlur={({ target: { value } }) => {
-														invoiceDispatch({
+														payloadDispatch({
 															type: 'userData',
 															data: values
 														});
@@ -533,17 +537,18 @@ const BillingBlock = () => {
 						<Button
 							color="danger"
 							disabled={
-								!invoice.name ||
-								!invoice.mobileNumber ||
-								(invoice.services && invoice.services.length === 0)
+								!payload.name ||
+								!payload.mobileNumber ||
+								(payload.services && payload.services.length === 0)
 							}
 							onClick={() => {
 								customAxios({
 									method: 'POST',
 									url: 'invoice/add',
-									data: invoice
+									data: payload
 								}).then(({ data, status }) => {
 									if (status === 200) {
+										getInvoices(invoiceDispatch);
 										history.push(`/invoice/${data._id}`);
 									}
 								});

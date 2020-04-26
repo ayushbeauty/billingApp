@@ -17,6 +17,8 @@ import {
 } from 'reactstrap';
 import moment from 'moment';
 import _ from 'lodash';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPen } from '@fortawesome/free-solid-svg-icons/faPen';
 
 import { Context, initialState, customAxios, getServices, getInvoices } from '../../store';
 
@@ -127,11 +129,11 @@ const BillingBlock = () => {
 			return (
 				<Row key={data._id} className="mb-1">
 					<Col xs={8}>
-						{data.title}
-						<span className="float-right">
+						<span className="mr-2">
 							<Button
 								size="sm"
 								outline={true}
+								color="link"
 								onClick={() => {
 									getCategories();
 									updateServiceData({ ...data, category: data.category._id });
@@ -139,9 +141,10 @@ const BillingBlock = () => {
 									updateaddServiceModalInstance(!addServiceModalInstance);
 								}}
 							>
-								Edit
+								<FontAwesomeIcon icon={faPen} />
 							</Button>
 						</span>
+						{data.title}
 					</Col>
 					<Col xs={4}>
 						<Button block={true} size="sm" onClick={() => addToCart(data)}>
@@ -154,32 +157,37 @@ const BillingBlock = () => {
 	};
 
 	const renderServices = (categories) => {
-		return _.map(categories, (value, key) => {
-			return (
-				<Card key={key}>
-					<CardHeader id={key}>
-						{key}
-						<span className="float-right">
-							<Button
-								size="sm"
-								outline={true}
-								onClick={(e) => {
-									e.preventDefault();
-									updateCategoryData(value[0].category);
-									setUpdateFlag(true);
-									updateaddCategoryModalInstance(!addCategoryModalInstance);
-								}}
-							>
-								Edit
-							</Button>
-						</span>
-					</CardHeader>
-					<UncontrolledCollapse toggler={`#${key}`}>
-						<CardBody>{renderList(value)}</CardBody>
-					</UncontrolledCollapse>
-				</Card>
-			);
-		});
+		if (!_.isEmpty(categories)) {
+			return _.map(categories, (value, key) => {
+				return (
+					<Card key={key}>
+						<CardHeader id={key}>
+							{key}
+							<span className="float-right">
+								<Button
+									size="sm"
+									outline={true}
+									color="link"
+									onClick={(e) => {
+										e.preventDefault();
+										updateCategoryData(value[0].category);
+										setUpdateFlag(true);
+										updateaddCategoryModalInstance(!addCategoryModalInstance);
+									}}
+								>
+									<FontAwesomeIcon icon={faPen} />
+								</Button>
+							</span>
+						</CardHeader>
+						<UncontrolledCollapse toggler={`#${key}`}>
+							<CardBody>{renderList(value)}</CardBody>
+						</UncontrolledCollapse>
+					</Card>
+				);
+			});
+		} else {
+			return <div className="text-center text-muted">Please add a new service to proceed forward</div>;
+		}
 	};
 
 	const renderCart = (list) => {

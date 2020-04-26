@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { customAxios } from '../../store';
-import { useParams, useHistory } from 'react-router-dom';
+import { useParams, useHistory, Link } from 'react-router-dom';
 import { Row, Col, Button } from 'reactstrap';
 import _ from 'lodash';
 import { useEffect } from 'react';
@@ -95,6 +95,9 @@ const Invoice = () => {
 	if (id) {
 		return (
 			<div>
+				<Link className="no-print" to="/invoice">
+					<Button color="link">Go Back</Button>
+				</Link>
 				<Row>
 					<Col className="text-center">
 						<h2 className="font-weight-light">Invoice</h2>
@@ -106,6 +109,7 @@ const Invoice = () => {
 						<Col>
 							<h3 className="font-weight-light">{invoiceData.customerId.name}</h3>
 							<span className="text-muted">{invoiceData.customerId.mobileNumber}</span>
+							<span className="float-right">{moment(invoiceData.created_at).format('DD/MM/YYYY')}</span>
 						</Col>
 					</Row>
 				)}

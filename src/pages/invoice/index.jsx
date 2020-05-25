@@ -29,6 +29,11 @@ const columns = [
 		sort: true
 	},
 	{
+		dataField: 'customerId.mobileNumber',
+		text: 'Mobile',
+		sort: false
+	},
+	{
 		dataField: 'services',
 		text: 'Particulars',
 		formatter: (cell, row) => {

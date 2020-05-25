@@ -128,7 +128,7 @@ const BillingBlock = () => {
 		return _.map(list, (data) => {
 			return (
 				<Row key={data._id} className="mb-1">
-					<Col xs={8}>
+					<Col xs={6} className="text-capitalize">
 						<span className="mr-2">
 							<Button
 								size="sm"
@@ -146,6 +146,9 @@ const BillingBlock = () => {
 						</span>
 						{data.title}
 					</Col>
+					<Col xs={2} className="text-right">
+						{data.amount}
+					</Col>
 					<Col xs={4}>
 						<Button block={true} size="sm" onClick={() => addToCart(data)}>
 							Add to Cart
@@ -159,9 +162,10 @@ const BillingBlock = () => {
 	const renderServices = (categories) => {
 		if (!_.isEmpty(categories)) {
 			return _.map(categories, (value, key) => {
+				let id = '_' + Math.random().toString(36).substr(2, 9);
 				return (
 					<Card key={key}>
-						<CardHeader id={key}>
+						<CardHeader id={id} xs={6} className="text-capitalize">
 							{key}
 							<span className="float-right">
 								<Button
@@ -179,7 +183,7 @@ const BillingBlock = () => {
 								</Button>
 							</span>
 						</CardHeader>
-						<UncontrolledCollapse toggler={`#${key}`}>
+						<UncontrolledCollapse toggler={`#${id}`}>
 							<CardBody>{renderList(value)}</CardBody>
 						</UncontrolledCollapse>
 					</Card>

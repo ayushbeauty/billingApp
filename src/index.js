@@ -4,6 +4,7 @@ import 'jquery';
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
+import 'react-datetime/css/react-datetime.css';
 import './index.scss';
 import App from './App';
 import * as serviceWorker from './serviceWorker';

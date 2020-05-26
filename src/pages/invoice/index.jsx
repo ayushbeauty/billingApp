@@ -18,7 +18,7 @@ const columns = [
 		formatter: (cell, row, rowIndex) => rowIndex + 1
 	},
 	{
-		dataField: 'created_at',
+		dataField: 'entryDate',
 		text: 'Date',
 		sort: true,
 		formatter: (cell, row, rowIndex) => (cell ? moment(cell).format('DD/MM/YYYY') : 'Date not specified')

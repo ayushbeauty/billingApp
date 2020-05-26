@@ -63,8 +63,8 @@ const invoiceReducer = (state, { type, payload }) => {
 export const Context = React.createContext();
 
 export const customAxios = Axios.create({
-	// baseURL: 'http://localhost:8000'
-	baseURL: 'https://ayush-be.herokuapp.com/'
+	baseURL: 'http://localhost:8000'
+	// baseURL: 'https://ayush-be.herokuapp.com/'
 });
 
 export const getServices = async (dispatch) => {

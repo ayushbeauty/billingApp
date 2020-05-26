@@ -15,7 +15,7 @@ import {
 	ModalBody,
 	ModalHeader
 } from 'reactstrap';
-import moment from 'moment';
+import moment, { isMoment } from 'moment';
 import _ from 'lodash';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPen } from '@fortawesome/free-solid-svg-icons/faPen';
@@ -26,6 +26,7 @@ import './style.scss';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
+import DateTime from 'react-datetime';
 
 const types = {
 	REQ: 'Request_Category',
@@ -74,8 +75,8 @@ const BillingBlock = () => {
 	const [ payload, payloadDispatch ] = useReducer((state, { type, data }) => {
 		switch (type) {
 			case 'userData':
-				let { mobileNumber, name } = data;
-				return { ...state, mobileNumber, name };
+				let { mobileNumber, name, entryDate } = data;
+				return { ...state, mobileNumber, name, entryDate };
 			case 'service':
 				let list = data.map((data) => {
 					return { serviceId: data._id, quantity: data.quantity };
@@ -485,11 +486,21 @@ const BillingBlock = () => {
 								<FormGroup row>
 									<Label xs={2}>Date</Label>
 									<Col xs={10}>
-										<Input
-											type="text"
-											placeholder="Today's date"
-											value={moment().format('DD/MM/YYYY')}
-											onChange={({ target: { value } }) => value}
+										<DateTime
+											defaultValue={moment()}
+											dateFormat={'DD/MM/YYYY'}
+											isValidDate={(currentDate) => {
+												return currentDate.isBetween(moment().subtract(7, 'days'), moment());
+											}}
+											timeFormat={false}
+											onBlur={(entryDate) => {
+												if (isMoment(entryDate)) {
+													payloadDispatch({
+														type: 'userData',
+														data: { ...values, entryDate }
+													});
+												}
+											}}
 										/>
 									</Col>
 								</FormGroup>

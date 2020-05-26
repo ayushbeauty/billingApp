@@ -114,7 +114,7 @@ const Invoice = () => {
 						<Col>
 							<h3 className="font-weight-light">{invoiceData.customerId.name}</h3>
 							<span className="text-muted">{invoiceData.customerId.mobileNumber}</span>
-							<span className="float-right">{moment(invoiceData.created_at).format('DD/MM/YYYY')}</span>
+							<span className="float-right">{moment(invoiceData.entryDate).format('DD/MM/YYYY')}</span>
 						</Col>
 					</Row>
 				)}

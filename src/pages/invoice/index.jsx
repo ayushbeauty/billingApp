@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { customAxios } from '../../store';
+import { customAxios, getInvoices } from '../../store';
 import { useParams, useHistory, Link } from 'react-router-dom';
 import { Row, Col, Button } from 'reactstrap';
 import _ from 'lodash';
@@ -10,55 +10,85 @@ import BootstrapTable from 'react-bootstrap-table-next';
 import { renderTotal } from './../billing-block';
 import { Context } from '../../store';
 import { useMemo } from 'react';
-
-const columns = [
-	{
-		dataField: '_id',
-		text: 'S.No',
-		formatter: (cell, row, rowIndex) => rowIndex + 1
-	},
-	{
-		dataField: 'entryDate',
-		text: 'Date',
-		sort: true,
-		formatter: (cell, row, rowIndex) => (cell ? moment(cell).format('DD/MM/YYYY') : 'Date not specified')
-	},
-	{
-		dataField: 'customerId.name',
-		text: 'Name',
-		sort: true
-	},
-	{
-		dataField: 'customerId.mobileNumber',
-		text: 'Mobile',
-		sort: false
-	},
-	{
-		dataField: 'services',
-		text: 'Particulars',
-		formatter: (cell, row) => {
-			return _.map(cell, ({ serviceId: { title, category: { name } } }, index) => {
-				return `${title} - ${name}${cell.length > 0
-					? index >= 0 && index < cell.length - 1 ? `, ` : ``
-					: ``}`;
-			});
-		}
-	},
-	{
-		dataField: 'updated_at',
-		text: 'Bill Amount',
-		formatter: (cell, { services }) => renderTotal(services)
-	}
-];
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrashAlt } from '@fortawesome/free-solid-svg-icons/faTrashAlt';
 
 const Invoice = () => {
 	const [ state, updateState ] = useState([]);
 	const [ invoiceData, updateInvoiceData ] = useState({});
-	const { data: { invoice } } = useContext(Context);
+	const { data: { invoice }, dispatches: { invoiceDispatch } } = useContext(Context);
 	let { id } = useParams();
 	let history = useHistory();
 	// let total = 0;
 	const [ total, updateTotal ] = useState(0);
+	const columns = [
+		{
+			dataField: 'isPaid',
+			text: 'S.No',
+			formatter: (cell, row, rowIndex) => rowIndex + 1
+		},
+		{
+			dataField: 'entryDate',
+			text: 'Date',
+			sort: true,
+			formatter: (cell, row, rowIndex) => (cell ? moment(cell).format('DD/MM/YYYY') : 'Date not specified')
+		},
+		{
+			dataField: 'customerId.name',
+			text: 'Name',
+			sort: true,
+			events: {
+				onClick: (e, column, columnIndex, row, rowIndex) => {
+					history.push(`/invoice/${row._id}`);
+				}
+			},
+			style: {
+				cursor: 'pointer'
+			}
+		},
+		{
+			dataField: 'customerId.mobileNumber',
+			text: 'Mobile',
+			sort: false
+		},
+		{
+			dataField: 'services',
+			text: 'Particulars',
+			formatter: (cell, row) => {
+				return _.map(cell, ({ serviceId: { title, category: { name } } }, index) => {
+					return `${title} - ${name}${cell.length > 0
+						? index >= 0 && index < cell.length - 1 ? `, ` : ``
+						: ``}`;
+				});
+			}
+		},
+		{
+			dataField: 'updated_at',
+			text: 'Bill Amount',
+			formatter: (cell, { services }) => renderTotal(services)
+		},
+		{
+			dataField: '_id',
+			text: 'Action',
+			formatter: (cell) => (
+				<Button
+					size="sm"
+					outline={true}
+					color="danger"
+					onClick={() => {
+						customAxios.get(`invoice/delete/${cell}`).then(({ data, status }) => {
+							if (status === 200) {
+								getInvoices(invoiceDispatch);
+							}
+						});
+					}}
+				>
+					<FontAwesomeIcon icon={faTrashAlt} />
+				</Button>
+			)
+		}
+	];
+
 	useEffect(
 		() => {
 			if (id) {
@@ -160,11 +190,11 @@ const Invoice = () => {
 					data={state}
 					hover
 					noDataIndication="No invoice found"
-					rowEvents={{
-						onClick: (e, { _id }) => {
-							history.push(`/invoice/${_id}`);
-						}
-					}}
+					// rowEvents={{
+					// 	onClick: (e, { _id }) => {
+					// 		history.push(`/invoice/${_id}`);
+					// 	}
+					// }}
 				/>
 			</div>
 		);

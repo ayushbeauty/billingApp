@@ -37,6 +37,15 @@ const Invoice = () => {
 			dataField: 'customerId.name',
 			text: 'Name',
 			sort: true,
+			formatter: (cell, row) => {
+				return (
+					<div>
+						{row.customerId.name}
+						<br />
+						<small>{row.customerId.mobileNumber}</small>
+					</div>
+				);
+			},
 			events: {
 				onClick: (e, column, columnIndex, row, rowIndex) => {
 					history.push(`/invoice/${row._id}`);
@@ -45,11 +54,6 @@ const Invoice = () => {
 			style: {
 				cursor: 'pointer'
 			}
-		},
-		{
-			dataField: 'customerId.mobileNumber',
-			text: 'Mobile',
-			sort: false
 		},
 		{
 			dataField: 'services',
@@ -88,6 +92,9 @@ const Invoice = () => {
 			)
 		}
 	];
+	useEffect(() => {
+		getInvoices(invoiceDispatch);
+	}, []);
 
 	useEffect(
 		() => {

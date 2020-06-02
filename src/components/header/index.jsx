@@ -30,6 +30,11 @@ const Header = () => {
 								Invoices
 							</NavLink>
 						</NavItem>
+						<NavItem>
+							<NavLink className="nav-link" to="/customers">
+								Customers
+							</NavLink>
+						</NavItem>
 					</Nav>
 				</Navbar>
 			</div>

@@ -1,0 +1,39 @@
+.customers-list {
+	.card {
+		background-color: rgba($color: #fff, $alpha: 0.5);
+		margin-bottom: 15px;
+		.card-body {
+			.media-left {
+				cursor: pointer;
+				text-transform: uppercase;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				border-radius: 50%;
+				background-color: #9370db;
+				color: #ffffff;
+				font-weight: 400;
+				font-size: 27px;
+				height: 50px;
+				width: 50px;
+				margin-right: 15px;
+				svg {
+					position: absolute;
+					display: none;
+				}
+				&:hover {
+					color: #9370db;
+					font-size: 100%;
+					background-color: gray;
+					svg {
+						color: #fff;
+						display: block;
+					}
+				}
+			}
+			.media-body {
+				text-transform: capitalize;
+			}
+		}
+	}
+}
